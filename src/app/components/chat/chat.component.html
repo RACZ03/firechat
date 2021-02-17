@@ -1,0 +1,43 @@
+
+
+
+<div class="row align-items-start">
+    <!-- Users -->
+    <div class="col-6">
+        <div class="list-group" style="width: 350px;">
+            <h4 class="list-group-item list-group-item-action active" aria-current="true">
+                User list
+            </h4>
+            <li class="list-group-item d-flex justify-content-between align-items-center" 
+                *ngFor="let user of _cs.users" (click)="selectUser( user )">
+                {{ user.displayName }}
+                <span class="badge bg-primary rounded-pill">0</span>
+            </li>
+        </div>
+    </div>
+    <!-- CHATS -->
+    <div class="col-6 chat-window">
+        <h4>Chat<small> {{ userReceptor.displayName }}</small>
+        </h4>
+        <hr>
+        <div class="app-mensajes" id="app-mensajes">
+            <div *ngFor="let message of _cs.textMessages"
+                 [ngClass]=" {'text-end':  _cs.user.uid === message.uid} ">
+                <span class="badge"
+                      [ngClass]=" {'bg-primary':  _cs.user.uid === message.uid, 'bg-success':  _cs.user.uid !== message.uid } ">
+                    {{ message.date }}
+                </span>
+                <p>
+                    {{ message.message }}
+                </p>
+            </div>
+        </div>
+        
+        <input type="text" 
+               name="message" 
+               class="form-control"
+               [(ngModel)]="message"
+               (keyup.enter)="onSubmit()"
+               placeholder="Send message">
+    </div>
+</div>

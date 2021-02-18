@@ -7,7 +7,8 @@ export interface ChatI {
 export interface Chat_userI {
     id?: string;
     idchat?: string;
-    uid?: string
+    uid?: string;
+    uid2?: string;
 }
 
 export interface UserI {

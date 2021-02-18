@@ -1,9 +1,11 @@
+import { Chat_userI } from './../interfaces/messageI';
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { map } from 'rxjs/operators';
 import { AngularFireAuth } from '@angular/fire/auth';
 import * as firebase from 'firebase/app';
-import { MessageI, UserI, ChatI, Chat_userI } from '../interfaces/messageI';
+import { MessageI, UserI, ChatI } from '../interfaces/messageI';
+import { JitSummaryResolver } from '@angular/compiler';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +17,8 @@ export class ChatService {
   private chat_user: Chat_userI = {};
 
   private chat_UserCollection: AngularFirestoreCollection<Chat_userI>;
+  private chat_UserCollection2: AngularFirestoreCollection<Chat_userI>;
+  private chat_UserMessages: AngularFirestoreCollection<Chat_userI>;
 
   private usersCollection: AngularFirestoreCollection<UserI>;
   public textMessages: MessageI[] = [];
@@ -29,6 +33,8 @@ export class ChatService {
     this.itemsCollection = afs.collection<MessageI>('message');
     this.chatCollection = afs.collection<ChatI>('chats');
     this.chat_UserCollection = afs.collection<Chat_userI>('chat_user');
+    this.chat_UserCollection2 = afs.collection<Chat_userI>('chat_user');
+    this.chat_UserMessages = afs.collection<Chat_userI>('chat_user');
 
     this.afAuth.authState.subscribe( user => {
       // console.log('Estado del usuario: ', user);
@@ -69,17 +75,33 @@ export class ChatService {
   }
   
   getChat() {
-    this.chat_UserCollection = this.afs.collection<MessageI>('chat_user', 
+    this.chat_UserCollection = this.afs.collection<Chat_userI>('chat_user', 
                                                           ref => ref.where('uid', '==', this.user.uid));
     return this.chat_UserCollection.valueChanges()
                                    .pipe(
                                      map( (chat_user: Chat_userI[]) => { 
-                                       console.log(chat_user)
-                                        this.chat_user = chat_user[0];
-                                        return chat_user[0]
-                                      }
-                                     )
-                                   )
+
+                                      const arrayChat: Chat_userI[] = [];
+
+                                      chat_user.forEach(async element => {
+                                      this.chat_UserCollection2 = await this.afs.collection<Chat_userI>('chat_user', 
+                                                          ref => ref.where('idchat', '==', element.idchat));
+                                        
+                                      return this.chat_UserCollection2.valueChanges().subscribe( query2 => {
+                                          const item = query2.filter(i => i.uid !== this.user.uid);
+                                          console.log(item)
+                                          let objet: Chat_userI = {
+                                            idchat: element.idchat,
+                                            uid: element.uid,
+                                            uid2: item[0].uid
+                                          }
+                                          arrayChat.push(objet);
+                                        })
+                                      });
+                                      return arrayChat
+                                    }
+                                  )
+                                )
   }
 
   uploadMessage(idchat: string) {

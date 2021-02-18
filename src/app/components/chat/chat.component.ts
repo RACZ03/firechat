@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
-import { DOCUMENT } from '@angular/common';
 import { ChatI, UserI } from '../../interfaces/messageI';
 
 @Component({
@@ -27,18 +26,18 @@ export class ChatComponent implements OnInit {
   }
 
   getMessages() {
-    this._cs.getChat().subscribe(chat => {
-      if (chat) {
-        this.chat = chat;
-        this._cs.uploadMessage(chat.idchat).subscribe( () => {
-          setTimeout(() => {
-            this.element.scrollTop = this.element.scrollHeight
+    this._cs.getChat().subscribe(chat => { console.log(chat)
+      // if (chat) {
+      //   this.chat = chat;
+      //   this._cs.uploadMessage(chat.idchat).subscribe( () => {
+      //     setTimeout(() => {
+      //       this.element.scrollTop = this.element.scrollHeight
             
-          }, 20);
-        })
-      } else {
-        this._cs.textMessages = [];
-      }
+      //     }, 20);
+      //   })
+      // } else {
+      //   this._cs.textMessages = [];
+      // }
     })
   }
 

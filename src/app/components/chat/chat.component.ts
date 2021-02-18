@@ -16,7 +16,7 @@ export class ChatComponent implements OnInit {
   constructor(
     public _cs: ChatService
   ) { 
-    this._cs.uploadUsers().subscribe();
+    // this._cs.uploadUsers().subscribe();
     this.getMessages();
     
   }

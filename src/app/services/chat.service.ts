@@ -84,18 +84,19 @@ export class ChatService {
                                       const arrayChat: Chat_userI[] = [];
 
                                       chat_user.forEach(async element => {
-                                      this.chat_UserCollection2 = await this.afs.collection<Chat_userI>('chat_user', 
-                                                          ref => ref.where('idchat', '==', element.idchat));
-                                        
-                                      return this.chat_UserCollection2.valueChanges().subscribe( query2 => {
+                                        this.chat_UserCollection2 = await this.afs.collection<Chat_userI>('chat_user', 
+                                                            ref => ref.where('idchat', '==', element.idchat));
+                                          
+                                        this.chat_UserCollection2.valueChanges().subscribe( query2 => {
                                           const item = query2.filter(i => i.uid !== this.user.uid);
-                                          console.log(item)
-                                          let objet: Chat_userI = {
-                                            idchat: element.idchat,
-                                            uid: element.uid,
-                                            uid2: item[0].uid
+                                          if (item.length > 0) {
+                                            let objet: Chat_userI = {
+                                              idchat: element.idchat,
+                                              uid: element.uid,
+                                              uid2: item[0].uid
+                                            }
+                                            arrayChat.push(objet);
                                           }
-                                          arrayChat.push(objet);
                                         })
                                       });
                                       return arrayChat

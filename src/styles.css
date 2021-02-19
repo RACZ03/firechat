@@ -39,6 +39,22 @@
   border-radius: 20px;
 }
 
+.new-group{
+  padding: 10px;
+  width: 300px;
+  height: 450px;
+  overflow: hidden;
+  border: 1px solid #4080FF;
+  border-radius: 20px;
+}
+
+.app-listuser{
+  overflow-y:scroll;
+  height:200px;
+  /*background:gray;*/
+  padding: 5px;
+}
+
 .app-mensajes{
   overflow-y:scroll;
   height:270px;

@@ -14,7 +14,9 @@ export class ChatService {
   private itemsCollection: AngularFirestoreCollection<MessageI>;
   
   private chatCollection: AngularFirestoreCollection<ChatI>;
+  private chatDoc: AngularFirestoreDocument<ChatI>;
   private chat_user: Chat_userI = {};
+  public chat_users: Chat_userI[] = [];
 
   private chat_UserCollection: AngularFirestoreCollection<Chat_userI>;
   private chat_UserCollection2: AngularFirestoreCollection<Chat_userI>;
@@ -22,7 +24,7 @@ export class ChatService {
   private usersCollection: AngularFirestoreCollection<UserI>;
   public textMessages: MessageI[] = [];
   public users: UserI[] = [];
-
+  private userDoc: AngularFirestoreDocument<UserI>;
   public user: UserI = {};
 
   constructor(
@@ -80,16 +82,31 @@ export class ChatService {
                                      map( (chat_user: Chat_userI[]) => { 
 
                                       chat_user.forEach( async element => {
+                                        // consultar al o las otras personas que tiene acceso al chat
                                         this.chat_UserCollection2 = await this.afs.collection<Chat_userI>('chat_user', 
                                                             ref => ref.where('idchat', '==', element.idchat));
                                           
-                                        return this.chat_UserCollection2.valueChanges().subscribe( query2 => {
+                                        return this.chat_UserCollection2.valueChanges().subscribe( async query2 => {
                                           const item = query2.find(i => i.uid !== this.user.uid);
                                           if (item) {
+                                            // validar si el chat es de tipo grupo
+                                            this.chatDoc = this.afs.doc<ChatI>(`chats/${item.idchat}`);
+                                            await this.chatDoc.valueChanges().subscribe( async chat => {
+                                              if(chat.tipo) {
+                                                element['displayName'] = chat.name;
+                                              } else {
+                                                // Obtener el nombre del usuario
+                                                this.userDoc = this.afs.doc<UserI>(`users/${item.uid}`);
+                                                await this.userDoc.valueChanges().subscribe( user => {
+                                                  element['displayName'] = user.displayName;
+                                                })
+                                              }
+                                            })
                                             element['uid2'] = item.uid;
                                           }
                                         })
                                       });
+                                      this.chat_users = chat_user;
                                       return chat_user
                                     }
                                   )
@@ -129,16 +146,17 @@ export class ChatService {
                                )
   }
 
-  async createChat() {
+  async createChat(name?: string, tipo: boolean = false) {
     let chat: ChatI = {
       date: new Date().getTime(),
-      tipo: false
+      tipo: tipo,
+      name: name === undefined ? '' : name
     }
+    console.log(chat)
     return await this.chatCollection.add(chat);
   }
 
   async addUserChat(idchat: string, uid?: string) {
-    console.log(uid)
     let uchat: Chat_userI = {
       uid: uid === undefined ? this.user.uid : uid,
       idchat: idchat
@@ -147,12 +165,13 @@ export class ChatService {
     return await this.chat_UserCollection.add(uchat);
   }
 
-  addMessage( text: string, idchat?: string) {
+  addMessage(displayName: string, text: string, idchat?: string) {
     let message: MessageI = {
       idchat: idchat === undefined ? this.chat_user.idchat: idchat,
       message: text,
       date: new Date().getTime(),
-      uid: this.user.uid
+      uid: this.user.uid,
+      displayName: displayName
     }
 
     return this.itemsCollection.add( message );

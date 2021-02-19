@@ -11,6 +11,7 @@ import { ChatComponent } from './components/chat/chat.component';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from './components/login/login.component';
+import { PipeModule } from './pipes/pipe.module';
 
 
 @NgModule({
@@ -25,6 +26,7 @@ import { LoginComponent } from './components/login/login.component';
     HttpClientModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFireDatabaseModule,
+    PipeModule
   ],
   providers: [
     AngularFirestore,

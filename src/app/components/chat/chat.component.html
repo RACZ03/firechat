@@ -1,43 +1,147 @@
 
 
 
-<div class="row align-items-start">
-    <!-- Users -->
-    <div class="col-6">
-        <div class="list-group" style="width: 350px;">
-            <h4 class="list-group-item list-group-item-action active" aria-current="true">
-                User list
+<div class="row mt-2 align-items-start">
+    <!-- List chat -->
+    <div class="col-6 mt-2">
+        <div class="list-group" style="width: 340px;">
+            <h4 class="list-group-item " aria-current="true">
+                Chats
+                <!-- BTN new grouo -->
+                <button class="btn btn-outline-primary float-end"
+                        title="New group" 
+                        (click)="btnGroup =!btnGroup">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill"
+                         viewBox="0 0 16 16"  *ngIf="!btnGroup">
+                        <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                        <path fill-rule="evenodd" d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/>
+                        <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill"
+                         viewBox="0 0 16 16" *ngIf="btnGroup">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                    </svg>
+                </button>
+                
+                <!-- BTN new chat -->
+                <button class="btn btn-outline-primary float-end mr-2 me-2"
+                        title="New chat" 
+                        (click)="btnNewChat =!btnNewChat">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-square" 
+                        viewBox="0 0 16 16" *ngIf="!btnNewChat">
+                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                        <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1v-1c0-1-1-4-6-4s-6 3-6 4v1a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12z"/>
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill"
+                         viewBox="0 0 16 16" *ngIf="btnNewChat">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+                    </svg>
+                </button>
+                
             </h4>
             <li class="list-group-item d-flex justify-content-between align-items-center" 
-                *ngFor="let user of _cs.users" (click)="selectUser( user )">
-                {{ user.displayName }}
+                *ngFor="let chat of _cs.chat_users" (click)="selectUser( chat )">
+                {{ chat.displayName }}
                 <span class="badge bg-primary rounded-pill">0</span>
             </li>
         </div>
     </div>
-    <!-- CHATS -->
-    <div class="col-6 chat-window">
-        <h4>Chat<small> {{ userReceptor.displayName }}</small>
-        </h4>
-        <hr>
-        <div class="app-mensajes" id="app-mensajes">
-            <div *ngFor="let message of _cs.textMessages"
-                 [ngClass]=" {'text-end':  _cs.user.uid === message.uid} ">
-                <span class="badge"
-                      [ngClass]=" {'bg-primary':  _cs.user.uid === message.uid, 'bg-success':  _cs.user.uid !== message.uid } ">
-                    {{ _cs.user.uid !== message.uid ? userReceptor.displayName : _cs.user.displayName}}
-                </span>
-                <p>
-                    {{ message.message }}
-                </p>
+
+    <!-- New group -->
+    <div class="col-4 mt-2" *ngIf="btnGroup">
+        <div class="new-group">
+            <div class="alert alert-danger" role="alert" *ngIf="btnAlert">
+                {{ alert }}
+            </div>
+            <input type="text" 
+                   name="nameGroup" 
+                   class="form-control"
+                   [(ngModel)]="nameGroup"
+                   (keyup.enter)="createGroup()"
+                   placeholder="Name group">
+            <hr>
+            <div class="list-group">
+                <select class="selectpicker" multiple data-live-search="true">
+                    <option *ngFor="let user of _cs.users" (click)="addItem(user)">
+                        {{ user.displayName}}
+                    </option>
+                </select>
+            </div>
+            <div class="app-listuser mt-2">
+                <div class="list-group">
+                    <button type="button" class="list-group-item list-group-item-action"
+                            *ngFor="let item of listTemporal; let i = index" (click)="remove(i)">
+                        {{ item.displayName }}
+                    </button>
+                </div>
+            </div>
+            
+
+            <div class="d-grid mt-4">
+                <button class="btn btn-outline-primary" (click)="createGroup( )">
+                    Create
+                </button>
             </div>
         </div>
-        
-        <input type="text" 
-               name="message" 
-               class="form-control"
-               [(ngModel)]="message"
-               (keyup.enter)="onSubmit()"
-               placeholder="Send message">
+    </div>
+
+    <!-- New chat -->
+    <div class="col-4 mt-2" *ngIf="btnNewChat">
+        <div class="new-group">
+            <div class="alert alert-danger" role="alert" *ngIf="btnAlert">
+                {{ alert }}
+            </div>
+            <input type="text" 
+                   name="textSearch" 
+                   class="form-control"
+                   [(ngModel)]="textSearch"
+                   placeholder="Search user">
+            <hr>
+            <div class="list-group">
+                <button type="button" class="list-group-item list-group-item-action"
+                        *ngFor="let user of _cs.users | filter: textSearch:'displayName' " (click)="onNew(user)">
+                    {{ user.displayName }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message -->
+    <div class="col-4 mt-2 " *ngIf="!btnGroup && !btnNewChat">
+
+        <div class="chat-window">
+            <h5>
+                {{ userReceptor.displayName === undefined ? 'Chats' : userReceptor.displayName }}
+            </h5>
+            <hr>
+            <div class="app-mensajes" id="app-mensajes">
+                <div *ngFor="let message of _cs.textMessages"
+                     [ngClass]=" {'text-end':  _cs.user.uid === message.uid} ">
+                    <span class="badge"
+                          [ngClass]=" {'bg-primary':  _cs.user.uid === message.uid, 'bg-success':  _cs.user.uid !== message.uid } ">
+                        {{ _cs.user.uid !== message.uid ? message.displayName : _cs.user.displayName}}
+                    </span>
+                    <p>
+                        {{ message.message }}
+                    </p>
+                </div>
+            </div>
+            
+            <input type="text" 
+                   name="message" 
+                   class="form-control"
+                   [(ngModel)]="message"
+                   (keyup.enter)="onSubmit()"
+                   placeholder="Send message">
+        </div>
+        <!-- Back button -->
+        <div class="d-grid mt-4" *ngIf="this.userReceptor.uid !== undefined">
+            <button class="btn btn-outline-danger" style="width: 300px;" (click)="selectUser( )">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                    <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
+                </svg>
+                Back
+            </button>
+        </div>
     </div>
 </div>

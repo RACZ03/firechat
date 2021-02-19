@@ -5,13 +5,15 @@
 </ul> -->
 <div class="container main-container">
   <div class="row">
-    <h1>
+    <h3>
       Firechat <small>{{chatService.user.displayName}}</small>
+    </h3>
+    <div>
       <button type="submit" class="btn btn-outline-danger" *ngIf="chatService.user.uid"
               (click)="chatService.logout()">
         Salir
       </button>
-    </h1>
+    </div>
     <hr>
   </div>
   <app-login *ngIf="!chatService.user.uid"></app-login>

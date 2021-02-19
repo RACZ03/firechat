@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
+<<<<<<< HEAD
 import { ChatI, UserI } from '../../interfaces/messageI';
 import { Console } from 'console';
+=======
+import { ChatI, UserI, Chat_userI } from '../../interfaces/messageI';
+>>>>>>> 4b03d4253d6421074ca907cf0126bbb509c45f9a
 
 @Component({
   selector: 'app-chat',
@@ -19,7 +23,6 @@ export class ChatComponent implements OnInit {
   ) { 
     this._cs.uploadUsers().subscribe();
     this.getMessages();
-    
   }
 
   ngOnInit() {

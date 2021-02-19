@@ -18,10 +18,6 @@ export class ChatService {
 
   private chat_UserCollection: AngularFirestoreCollection<Chat_userI>;
   private chat_UserCollection2: AngularFirestoreCollection<Chat_userI>;
-<<<<<<< HEAD
-=======
-  public chat_u: Chat_userI[] = [];
->>>>>>> 4b03d4253d6421074ca907cf0126bbb509c45f9a
 
   private usersCollection: AngularFirestoreCollection<UserI>;
   public textMessages: MessageI[] = [];

@@ -18,7 +18,6 @@ export class ChatService {
 
   private chat_UserCollection: AngularFirestoreCollection<Chat_userI>;
   private chat_UserCollection2: AngularFirestoreCollection<Chat_userI>;
-  private chat_UserMessages: AngularFirestoreCollection<Chat_userI>;
 
   private usersCollection: AngularFirestoreCollection<UserI>;
   public textMessages: MessageI[] = [];
@@ -34,7 +33,6 @@ export class ChatService {
     this.chatCollection = afs.collection<ChatI>('chats');
     this.chat_UserCollection = afs.collection<Chat_userI>('chat_user');
     this.chat_UserCollection2 = afs.collection<Chat_userI>('chat_user');
-    this.chat_UserMessages = afs.collection<Chat_userI>('chat_user');
 
     this.afAuth.authState.subscribe( user => {
       // console.log('Estado del usuario: ', user);
@@ -81,25 +79,18 @@ export class ChatService {
                                    .pipe(
                                      map( (chat_user: Chat_userI[]) => { 
 
-                                      const arrayChat: Chat_userI[] = [];
-
-                                      chat_user.forEach(async element => {
+                                      chat_user.forEach( async element => {
                                         this.chat_UserCollection2 = await this.afs.collection<Chat_userI>('chat_user', 
                                                             ref => ref.where('idchat', '==', element.idchat));
                                           
-                                        this.chat_UserCollection2.valueChanges().subscribe( query2 => {
-                                          const item = query2.filter(i => i.uid !== this.user.uid);
-                                          if (item.length > 0) {
-                                            let objet: Chat_userI = {
-                                              idchat: element.idchat,
-                                              uid: element.uid,
-                                              uid2: item[0].uid
-                                            }
-                                            arrayChat.push(objet);
+                                        return this.chat_UserCollection2.valueChanges().subscribe( query2 => {
+                                          const item = query2.find(i => i.uid !== this.user.uid);
+                                          if (item) {
+                                            element['uid2'] = item.uid
                                           }
                                         })
                                       });
-                                      return arrayChat
+                                      return chat_user
                                     }
                                   )
                                 )

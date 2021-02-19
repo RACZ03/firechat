@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { ChatI, UserI } from '../../interfaces/messageI';
+import { Console } from 'console';
 
 @Component({
   selector: 'app-chat',
@@ -16,7 +17,7 @@ export class ChatComponent implements OnInit {
   constructor(
     public _cs: ChatService
   ) { 
-    // this._cs.uploadUsers().subscribe();
+    this._cs.uploadUsers().subscribe();
     this.getMessages();
     
   }
@@ -25,24 +26,28 @@ export class ChatComponent implements OnInit {
     this.element = document.getElementById('app-mensajes');
   }
 
-  getMessages() {
-    this._cs.getChat().subscribe(chat => { console.log(chat)
-      // if (chat) {
-      //   this.chat = chat;
-      //   this._cs.uploadMessage(chat.idchat).subscribe( () => {
-      //     setTimeout(() => {
-      //       this.element.scrollTop = this.element.scrollHeight
-            
-      //     }, 20);
-      //   })
-      // } else {
-      //   this._cs.textMessages = [];
-      // }
+  async getMessages() {
+    await this._cs.getChat().subscribe(chat => {
+      if (chat) {
+        setTimeout(() => {
+          const item = chat.find(c => c.uid2 === this.userReceptor.uid);
+          if (item) {
+            this._cs.uploadMessage(item.idchat).subscribe( () => {
+              setTimeout(() => {
+                this.element.scrollTop = this.element.scrollHeight
+                }, 20);
+              })
+          } else {
+            this._cs.textMessages = [];
+          }
+        }, 500);
+      }
     })
   }
 
   selectUser(user: UserI) {
     this.userReceptor = user;
+    this.getMessages();
   }
 
   async onSubmit() {

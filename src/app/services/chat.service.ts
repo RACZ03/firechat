@@ -86,7 +86,7 @@ export class ChatService {
                                         return this.chat_UserCollection2.valueChanges().subscribe( query2 => {
                                           const item = query2.find(i => i.uid !== this.user.uid);
                                           if (item) {
-                                            element['uid2'] = item.uid
+                                            element['uid2'] = item.uid;
                                           }
                                         })
                                       });

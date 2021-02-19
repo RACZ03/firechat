@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { ChatI, UserI } from '../../interfaces/messageI';
-import { Console } from 'console';
 
 @Component({
   selector: 'app-chat',
@@ -14,6 +13,7 @@ export class ChatComponent implements OnInit {
   public element: any;
   public userReceptor: UserI = {};
   public chat: ChatI = {};
+  public idchat: string = '';
   constructor(
     public _cs: ChatService
   ) { 
@@ -31,6 +31,7 @@ export class ChatComponent implements OnInit {
         setTimeout(() => {
           const item = chat.find(c => c.uid2 === this.userReceptor.uid);
           if (item) {
+            this.idchat = item.idchat;
             this._cs.uploadMessage(item.idchat).subscribe( () => {
               setTimeout(() => {
                 this.element.scrollTop = this.element.scrollHeight
@@ -38,6 +39,7 @@ export class ChatComponent implements OnInit {
               })
           } else {
             this._cs.textMessages = [];
+            this.idchat = '';
           }
         }, 500);
       }
@@ -59,7 +61,7 @@ export class ChatComponent implements OnInit {
               .then( async resp => {
                 await this.addUserChat(resp.id);
                 await this.addUserChat(resp.id, this.userReceptor.uid);
-                this.sendMessage(resp.id)
+                this.sendMessage();
               } )
     } else {
       await this.sendMessage();
@@ -73,8 +75,9 @@ export class ChatComponent implements OnInit {
             .catch( (err) => console.log('Error', err) )
   }
 
-  sendMessage(idchat?: string) {
-    this._cs.addMessage( this.message , idchat)
+  sendMessage() {
+    console.log(this.idchat);
+    this._cs.addMessage( this.message , this.idchat)
             .then( () => { this.message = ''} )
             .catch( (err) => console.log('Error', err) )
   }

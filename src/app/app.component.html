@@ -6,7 +6,7 @@
 <div class="container main-container">
   <div class="row">
     <h1>
-      Firechat
+      Firechat <small>{{chatService.user.displayName}}</small>
       <button type="submit" class="btn btn-outline-danger" *ngIf="chatService.user.uid"
               (click)="chatService.logout()">
         Salir

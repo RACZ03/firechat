@@ -25,7 +25,7 @@
                  [ngClass]=" {'text-end':  _cs.user.uid === message.uid} ">
                 <span class="badge"
                       [ngClass]=" {'bg-primary':  _cs.user.uid === message.uid, 'bg-success':  _cs.user.uid !== message.uid } ">
-                    {{ message.date }}
+                    {{ _cs.user.uid !== message.uid ? userReceptor.displayName : _cs.user.displayName}}
                 </span>
                 <p>
                     {{ message.message }}

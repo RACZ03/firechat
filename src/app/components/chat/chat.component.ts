@@ -30,24 +30,26 @@ export class ChatComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.element = document.getElementById('app-mensajes');
+    setTimeout(() => {
+      this.element = document.getElementById('app-mensajes');
+    }, 100);
   }
 
   async getMessages() {
     await this._cs.getChat().subscribe(chat => {
-      if (chat) { console.log(chat)
+      if (chat) {
         setTimeout(() => {
           const item = chat.find(c => c.uid2 === this.userReceptor.uid);
           if (item) {
             this.idchat = item.idchat;
+            console.log('GET message',this.idchat)
             this._cs.uploadMessage(item.idchat).subscribe( () => {
               setTimeout(() => {
                 this.element.scrollTop = this.element.scrollHeight
-                }, 40);
+                }, 20);
               })
           } else {
             this._cs.textMessages = [];
-            this.idchat = '';
           }
         }, 500);
       }
@@ -55,6 +57,7 @@ export class ChatComponent implements OnInit {
   }
 
   onNew(user: UserI) {
+    this.idchat = '';
     this.btnNewChat = !this.btnNewChat;
     this.userReceptor.uid = user.uid;
     this.userReceptor.displayName = user.displayName;
@@ -62,7 +65,9 @@ export class ChatComponent implements OnInit {
   }
 
   selectUser(chatu?: Chat_userI) {
+    console.log(chatu.idchat)
     if(chatu) {
+      this.idchat = chatu.idchat;
       this.userReceptor.uid = chatu.uid2;
       this.userReceptor.displayName = chatu.displayName;
       this.getMessages();
@@ -78,6 +83,10 @@ export class ChatComponent implements OnInit {
     }
 
     if (this._cs.textMessages.length === 0) {
+      if (this.idchat) { 
+        this.sendMessage();
+        return;
+      }
       await this._cs.createChat()
               .then( async resp => {
                 await this.addUserChat(resp.id);
@@ -98,7 +107,6 @@ export class ChatComponent implements OnInit {
   }
 
   sendMessage() {
-    console.log(this.idchat);
     this._cs.addMessage(this._cs.user.displayName, this.message , this.idchat)
             .then( () => { this.message = ''} )
             .catch( (err) => console.log('Error', err) )
@@ -119,13 +127,9 @@ export class ChatComponent implements OnInit {
   async createGroup() {
     const validated = this.validate()
     if (validated) {
-      // await this.listTemporal.forEach( async item => {
-      //   console.log(item.uid)
-      // });
       await this._cs.createChat(this.nameGroup, true)
         .then( async resp => {
-          this.idchat = resp.id;
-          let user: UserI = { displayName: this.nameGroup };
+          let chatu: Chat_userI = { displayName: this.nameGroup, idchat: resp.id };
           this.nameGroup = '';
           // Ingresar al user autenticado
           await this.addUserChat(resp.id);
@@ -133,9 +137,11 @@ export class ChatComponent implements OnInit {
           await this.listTemporal.forEach( async item => {
             await this.addUserChat(resp.id, item.uid);
           });
-        this.btnGroup = false;
-        this.selectUser(user);
-      });
+          setTimeout(() => {
+            this.selectUser(chatu);
+            this.btnGroup = false;
+          }, 500);
+        });
     }
   }
 

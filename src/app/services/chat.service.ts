@@ -5,7 +5,6 @@ import { map } from 'rxjs/operators';
 import { AngularFireAuth } from '@angular/fire/auth';
 import * as firebase from 'firebase/app';
 import { MessageI, UserI, ChatI } from '../interfaces/messageI';
-import { JitSummaryResolver } from '@angular/compiler';
 
 @Injectable({
   providedIn: 'root'
@@ -152,7 +151,6 @@ export class ChatService {
       tipo: tipo,
       name: name === undefined ? '' : name
     }
-    console.log(chat)
     return await this.chatCollection.add(chat);
   }
 
@@ -166,8 +164,9 @@ export class ChatService {
   }
 
   addMessage(displayName: string, text: string, idchat?: string) {
+    console.log(idchat)
     let message: MessageI = {
-      idchat: idchat === undefined ? this.chat_user.idchat: idchat,
+      idchat: idchat,
       message: text,
       date: new Date().getTime(),
       uid: this.user.uid,

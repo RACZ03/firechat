@@ -48,7 +48,7 @@
     </div>
 
     <!-- New group -->
-    <div class="col-4 mt-2" *ngIf="btnGroup">
+    <div class="col-6 mt-2" *ngIf="btnGroup">
         <div class="new-group">
             <div class="alert alert-danger" role="alert" *ngIf="btnAlert">
                 {{ alert }}
@@ -86,7 +86,7 @@
     </div>
 
     <!-- New chat -->
-    <div class="col-4 mt-2" *ngIf="btnNewChat">
+    <div class="col-6 mt-2" *ngIf="btnNewChat">
         <div class="new-group">
             <div class="alert alert-danger" role="alert" *ngIf="btnAlert">
                 {{ alert }}
@@ -107,7 +107,7 @@
     </div>
 
     <!-- Message -->
-    <div class="col-4 mt-2 " *ngIf="!btnGroup && !btnNewChat">
+    <div class="col-6 mt-2 " *ngIf="!btnGroup && !btnNewChat">
 
         <div class="chat-window">
             <h5>

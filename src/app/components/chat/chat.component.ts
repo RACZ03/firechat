@@ -161,14 +161,10 @@ export class ChatComponent implements OnInit {
 
   onSave() {
     if(this.listTemporal.length > this.listIntrantes.length) {
-      this.listTemporal.forEach( item => {
-        
-
-        if(obj) { 
-          // this._cs.addUserChat(this.idchat, item.uid)
-          console.log(obj)
-        } 
-      })
+      console.log(this.listTemporal.length)
+      console.log(this.listIntrantes.length)
+      // const list = this.listTemporal.slice(this.listIntegrantes.length, this.listTemporal.length);
+      // console.lof(list)
     }
   }
 

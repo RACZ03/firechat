@@ -8,9 +8,12 @@ export interface ChatI {
 export interface Chat_userI {
     id?: string;
     idchat?: string;
+    date?: number;
     uid?: string;
     uid2?: string;
     displayName?: string;
+    grupo?: boolean;
+    unseenMessage?: number;
 }
 
 export interface UserI {
@@ -18,12 +21,15 @@ export interface UserI {
     email?: string,
     displayName?: string,
     photoUrl?: string
+    grupo?: boolean
 }
 
 export interface MessageI {
+    id?: string;
     idchat?: string;
     uid?: string;
     displayName?: string;
     message?: string;
     date?: number;
+    status?: boolean;
 }

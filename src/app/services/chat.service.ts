@@ -1,24 +1,26 @@
-import { Chat_userI } from './../interfaces/messageI';
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { map } from 'rxjs/operators';
 import { AngularFireAuth } from '@angular/fire/auth';
 import * as firebase from 'firebase/app';
-import { MessageI, UserI, ChatI } from '../interfaces/messageI';
+import { MessageI, UserI, ChatI, Chat_userI } from '../interfaces/messageI';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
   private itemsCollection: AngularFirestoreCollection<MessageI>;
+  private messageDoc: AngularFirestoreDocument<MessageI>;
   
   private chatCollection: AngularFirestoreCollection<ChatI>;
-  private chatDoc: AngularFirestoreDocument<ChatI>;
-  private chat_user: Chat_userI = {};
   public chat_users: Chat_userI[] = [];
-
+  private chatDoc: AngularFirestoreDocument<ChatI>;
+  
   private chat_UserCollection: AngularFirestoreCollection<Chat_userI>;
   private chat_UserCollection2: AngularFirestoreCollection<Chat_userI>;
+  private chat_U: Observable<Chat_userI[]>;
+  private chat_UserDoc: AngularFirestoreDocument<Chat_userI>;
 
   private usersCollection: AngularFirestoreCollection<UserI>;
   public textMessages: MessageI[] = [];
@@ -75,7 +77,8 @@ export class ChatService {
   
   getChat() {
     this.chat_UserCollection = this.afs.collection<Chat_userI>('chat_user', 
-                                                          ref => ref.where('uid', '==', this.user.uid));
+                                                          ref => ref.where('uid', '==', this.user.uid)
+                                                                    .orderBy('date', 'desc'));
     return this.chat_UserCollection.valueChanges()
                                    .pipe(
                                      map( (chat_user: Chat_userI[]) => { 
@@ -93,6 +96,7 @@ export class ChatService {
                                             await this.chatDoc.valueChanges().subscribe( async chat => {
                                               if(chat.tipo) {
                                                 element['displayName'] = chat.name;
+                                                element['grupo'] = true
                                               } else {
                                                 // Obtener el nombre del usuario
                                                 this.userDoc = this.afs.doc<UserI>(`users/${item.uid}`);
@@ -100,6 +104,12 @@ export class ChatService {
                                                   element['displayName'] = user.displayName;
                                                 })
                                               }
+                                            })
+                                            // Obtener mensajes no visto
+                                            this.itemsCollection = await this.afs.collection<MessageI>('message',
+                                                                                  ref => ref.where('status', '==', false));
+                                            this.itemsCollection.valueChanges().subscribe( resp => {
+                                              if(resp.length > 0) element['unseenMessage'] = resp.length
                                             })
                                             element['uid2'] = item.uid;
                                           }
@@ -112,21 +122,44 @@ export class ChatService {
                                 )
   }
 
+  async getMembers(idchat: string) {
+    this.chat_UserCollection2 = await this.afs.collection<Chat_userI>('chat_user', 
+    ref => ref.where('idchat', '==', idchat));
+  
+    return this.chat_UserCollection2
+  }
+
+  getUser(uid) {
+    this.userDoc = this.afs.doc<UserI>(`users/${uid}`);
+    return this.userDoc.snapshotChanges().pipe(map(action => {
+      if (action.payload.exists === false) {
+        return null;
+      } else {
+        const data = action.payload.data() as UserI;
+        data.uid = action.payload.id;
+        return data;
+      }
+    }));
+  }
+
   uploadMessage(idchat: string) {
     this.itemsCollection = this.afs.collection<MessageI>('message', 
                                                           ref => ref.where('idchat', '==', idchat)
                                                                     .orderBy('date', 'desc')
                                                                     .limit(5) );
-    
-    return this.itemsCollection.valueChanges()
-                               .pipe(
-                                  map( (messages: MessageI[]) => {
-                                    this.textMessages = [];
-                                    for ( let message of messages) {
-                                      this.textMessages.unshift( message );
-                                    }
-                                  })
-                               )
+    return this.itemsCollection.snapshotChanges()
+    .pipe(map( changes => {
+      this.textMessages = [];
+      return changes.map( action => {
+        const data = action.payload.doc.data() as MessageI;
+        data.id = action.payload.doc.id;
+        
+        this.textMessages.unshift( data );
+        if(!data.status) {
+          this.messageUpdate(data.id)
+        }
+      });
+    }));                    
   }
 
   uploadUsers() {
@@ -157,23 +190,50 @@ export class ChatService {
   async addUserChat(idchat: string, uid?: string) {
     let uchat: Chat_userI = {
       uid: uid === undefined ? this.user.uid : uid,
+      date: new Date().getTime(),
       idchat: idchat
     }
 
-    return await this.chat_UserCollection.add(uchat);
+    return await this.chat_UserCollection.add(uchat).then( resp => {
+      uchat.id = resp.id;
+      resp.update(uchat)
+    });
   }
 
-  addMessage(displayName: string, text: string, idchat?: string) {
-    console.log(idchat)
+  async addMessage(displayName: string, text: string, idchat?: string) {
     let message: MessageI = {
       idchat: idchat,
       message: text,
       date: new Date().getTime(),
       uid: this.user.uid,
-      displayName: displayName
+      displayName: displayName,
+      status: false
     }
 
     return this.itemsCollection.add( message );
+  }
+
+  // async updateMessage(idchat: string) {
+  //   // Update status chat
+  //   this.chat_UserCollection = this.afs.collection<Chat_userI>('chat_user', ref => ref.where('idchat', '==', idchat));
+
+  //   await this.chat_UserCollection.valueChanges().subscribe( data => {
+  //     console.log(data)
+  //     data.forEach( item => {
+  //       item.date = new Date().getTime();
+  //       this.chat_UserDoc = this.afs.doc<Chat_userI>(`chat_user/${item.id}`);
+  //       this.chat_UserDoc.update(item);
+  //     })
+  //     // console.log(data)
+  //   })
+  // }
+
+  messageUpdate(idMessage: string) {
+    this.messageDoc = this.afs.doc<MessageI>(`message/${idMessage}`);
+    let message: MessageI = {
+      status: true
+    }
+    this.messageDoc.update(message);
   }
 
 }

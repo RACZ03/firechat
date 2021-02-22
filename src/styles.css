@@ -61,8 +61,26 @@
   /*background:gray;*/
   padding: 5px;
 }
-
-
+p {
+  margin-bottom: 3px;
+}
+.message-text {
+  padding: 8px;
+  width: fit-content;
+  background-color: rgb(90, 132, 95);
+  color: white;
+  border-radius: 10px;
+  margin-left: auto;
+  font-size: 12px;
+}
+.message-text2 {
+  padding: 8px;
+  width: fit-content;
+  background-color: dodgerblue;
+  color: white;
+  border-radius: 10px;
+  font-size: 12px;
+}
 /* Animaciones */
 .animated {
   -webkit-animation-duration: 1s;

@@ -1,9 +1,9 @@
 
 
 
-<div class="row mt-2 align-items-start">
+<div class="row align-items-start">
     <!-- List chat -->
-    <div class="col-6 mt-2">
+    <div class="col mt-3">
         <div class="list-group" style="width: 340px;">
             <h4 class="list-group-item " aria-current="true">
                 Chats
@@ -42,13 +42,13 @@
             <li class="list-group-item d-flex justify-content-between align-items-center" 
                 *ngFor="let chat of _cs.chat_users" (click)="selectUser( chat )">
                 {{ chat.displayName }}
-                <span class="badge bg-primary rounded-pill">0</span>
+                <span class="badge bg-primary rounded-pill" *ngIf=" chat.uid !== _cs.user.uid && chat.unseenMessage > 0">{{ chat.unseenMessage }}</span>
             </li>
         </div>
     </div>
 
     <!-- New group -->
-    <div class="col-6 mt-2" *ngIf="btnGroup">
+    <div class="col mt-3" *ngIf="btnGroup">
         <div class="new-group">
             <div class="alert alert-danger" role="alert" *ngIf="btnAlert">
                 {{ alert }}
@@ -63,6 +63,7 @@
             <div class="list-group">
                 <select class="selectpicker" multiple data-live-search="true">
                     <option *ngFor="let user of _cs.users" (click)="addItem(user)">
+                        <!-- <img [src]="user.photoUrl" alt="" style="width: 40px; height: 40px; border-radius: 50%;"> -->
                         {{ user.displayName}}
                     </option>
                 </select>
@@ -71,6 +72,7 @@
                 <div class="list-group">
                     <button type="button" class="list-group-item list-group-item-action"
                             *ngFor="let item of listTemporal; let i = index" (click)="remove(i)">
+                            <img [src]="item.photoUrl" alt="" style="width: 35px; height: 35px; border-radius: 50%;">
                         {{ item.displayName }}
                     </button>
                 </div>
@@ -86,7 +88,7 @@
     </div>
 
     <!-- New chat -->
-    <div class="col-6 mt-2" *ngIf="btnNewChat">
+    <div class="col mt-3" *ngIf="btnNewChat">
         <div class="new-group">
             <div class="alert alert-danger" role="alert" *ngIf="btnAlert">
                 {{ alert }}
@@ -100,6 +102,7 @@
             <div class="list-group">
                 <button type="button" class="list-group-item list-group-item-action"
                         *ngFor="let user of _cs.users | filter: textSearch:'displayName' " (click)="onNew(user)">
+                        <img [src]="user.photoUrl" alt="" style="width: 35px; height: 35px; border-radius: 50%;">
                     {{ user.displayName }}
                 </button>
             </div>
@@ -107,21 +110,84 @@
     </div>
 
     <!-- Message -->
-    <div class="col-6 mt-2 " *ngIf="!btnGroup && !btnNewChat">
+    <div class="col mt-3 " *ngIf="!btnGroup && !btnNewChat">
 
         <div class="chat-window">
             <h5>
+                <!-- <img [src]="userReceptor.photoUrl" alt="" style="width: 35px; height: 35px; border-radius: 50%;"> -->
                 {{ userReceptor.displayName === undefined ? 'Chats' : userReceptor.displayName }}
+
+                <!-- BTN new grouo -->
+                <button class="btn btn-outline-primary float-end"
+                        title="Info" 
+                        *ngIf="userReceptor.grupo"
+                        data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill"
+                         viewBox="0 0 16 16" >
+                        <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                        <path fill-rule="evenodd" d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/>
+                        <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                    </svg>
+                </button>
             </h5>
+            <!-- Modal -->
+            <div class="modal fade" id="staticBackdrop" 
+                data-bs-backdrop="static" data-bs-keyboard="false" 
+                tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">
+                                Members
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="text-end mb-1">
+                                <button class="btn btn-outline-primary"
+                                        title="New chat" 
+                                        (click)="btnAddMenbers =!btnAddMenbers">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-square" viewBox="0 0 16 16">
+                                        <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="list-group" *ngIf="btnAddMenbers">
+                                <select class="selectpicker" multiple data-live-search="true">
+                                    <option *ngFor="let user of _cs.users" (click)="addItem(user)">
+                                        <!-- <img [src]="user.photoUrl" alt="" style="width: 40px; height: 40px; border-radius: 50%;"> -->
+                                        {{ user.displayName}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="list-group">
+                                <button type="button" class="list-group-item list-group-item-action"
+                                        *ngFor="let item of listTemporal; let i = index" (click)="remove(i)">
+                                        <img [src]="item.photoUrl" alt="" style="width: 35px; height: 35px; border-radius: 50%;">
+                                    {{ item.displayName }}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="onSave()">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <hr>
             <div class="app-mensajes" id="app-mensajes">
                 <div *ngFor="let message of _cs.textMessages"
                      [ngClass]=" {'text-end':  _cs.user.uid === message.uid} ">
-                    <span class="badge"
-                          [ngClass]=" {'bg-primary':  _cs.user.uid === message.uid, 'bg-success':  _cs.user.uid !== message.uid } ">
-                        {{ _cs.user.uid !== message.uid ? message.displayName : _cs.user.displayName}}
-                    </span>
-                    <p>
+                     <span class="badge" *ngIf="userReceptor.grupo"
+                           [ngClass]=" {'bg-primary':  _cs.user.uid === message.uid, 'bg-success':  _cs.user.uid !== message.uid } ">
+                         {{ _cs.user.uid !== message.uid ? message.displayName : _cs.user.displayName}}
+                     </span>
+                     <p [ngClass]=" _cs.user.uid !== message.uid ? 'message-text2' : 'message-text'" *ngIf="!userReceptor.grupo">
+                        {{ message.message }}
+                    </p>
+                    <p *ngIf="userReceptor.grupo">
                         {{ message.message }}
                     </p>
                 </div>
@@ -132,7 +198,8 @@
                    class="form-control"
                    [(ngModel)]="message"
                    (keyup.enter)="onSubmit()"
-                   placeholder="Send message">
+                   placeholder="Send message"
+                   [disabled]="!bandInput">
         </div>
         <!-- Back button -->
         <div class="d-grid mt-4" *ngIf="this.userReceptor.uid !== undefined">

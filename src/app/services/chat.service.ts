@@ -145,8 +145,7 @@ export class ChatService {
   uploadMessage(idchat: string) {
     this.itemsCollection = this.afs.collection<MessageI>('message', 
                                                           ref => ref.where('idchat', '==', idchat)
-                                                                    .orderBy('date', 'desc')
-                                                                    .limit(5) );
+                                                                    .orderBy('date', 'desc'));
     return this.itemsCollection.snapshotChanges()
     .pipe(map( changes => {
       this.textMessages = [];

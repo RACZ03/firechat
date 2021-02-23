@@ -6,12 +6,12 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { environment } from '../environments/environment';
 import { ChatComponent } from './components/chat/chat.component';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from './components/login/login.component';
 import { PipeModule } from './pipes/pipe.module';
+import { environment } from 'src/environments/environment.prod';
 
 
 @NgModule({
